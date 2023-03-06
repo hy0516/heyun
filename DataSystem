@@ -1,7 +1,5 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-
 #pragma warning(disable:6031)
-
 #pragma warning(disable:6011)
 
 #include <stdio.h>
@@ -219,9 +217,33 @@ void inputDate(char date[]) {
 	} while (1);
 
 }
+void editFamilyMember1(pMember member) {
 
+	printf("╔-----------------------------------------╗\n");
 
+	printf(" * 编辑家谱成员信息 *\n");
 
+	if (strlen(member->name)) {
+
+		printf(" 姓名：%s\n", member->name);
+
+	}
+
+	else {
+
+		printf(" 姓名：");
+
+		scanf("%s", member->name);
+
+	}
+
+	printf(" 妻子：");
+
+	scanf("%s", member->wife);
+
+	printf("╚-----------------------------------------╝\n");
+
+}
 void editFamilyMember(pMember member) {
 
 	printf("╔-----------------------------------------╗\n");
@@ -620,7 +642,7 @@ void addFamilyTree(pTreeNode* root) {
 
 				strcpy(member.name, name);
 
-				editFamilyMember(&member);
+				editFamilyMember1(&member);
 
 				createTreeNode(target, &member);
 
@@ -857,10 +879,10 @@ void statFamilyTree(pTreeNode root) {
 void menuOptions(pTreeNode root) {
 
 	system("title 家族谱管理系统");
-
-	while (1) {
+int option = 1;
+	while (option) {
 		system("cls");
-		int option = 0;
+		
 
 		printf("╔-----------------------------------------╗\n");
 
@@ -886,57 +908,44 @@ void menuOptions(pTreeNode root) {
 
 		scanf("%d", &option);
 
-		if (option == 0) break;
-
+		
 		switch (option) {
-			
+		case 0:
+			printf("\n\n\t再见~\n\n"); 
+				break;
 		case 1:
-
-			showFamilyTree(root, 0);
-			system("pause");
-			break;
-
-		case 2:
-
 			showFamilyTree(root, 1);
 			system("pause");
 			break;
 
-		case 3:
-
+		case 2:
 			addFamilyTree(&root);
 			system("pause");
+			break;
 
+		case 3:
+			removeFamilyTree(&root);
+			system("pause");
 			break;
 
 		case 4:
-
-			removeFamilyTree(&root);
+			findFamilyTree(root);
 			system("pause");
-
 			break;
 
 		case 5:
-
-			findFamilyTree(root);
+			modifyFamilyTree(root);
 			system("pause");
-
 			break;
 
 		case 6:
-
-			modifyFamilyTree(root);
-			system("pause");
-
-			break;
-
-		case 7:
-
 			statFamilyTree(root);
 			system("pause");
-
 			break;
-
+		default:
+			printf("\n序号错误，请重新输入：\n");
+			system("pause");
+			break;
 		}
 
 	}
@@ -948,11 +957,10 @@ void menuOptions(pTreeNode root) {
 int main() {
 
 	pTreeNode root = loadFamilyTree();
-	
-	menuOptions(root);
-
-	recursiveFamilyTreeNodeClear(root);
-
+	if (root) {
+		menuOptions(root);
+		recursiveFamilyTreeNodeClear(root);
+	}
 	return 0;
 
 }
