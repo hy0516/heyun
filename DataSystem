@@ -1,122 +1,64 @@
 #define _CRT_SECURE_NO_WARNINGS 1
-#pragma warning(disable:6031)
-#pragma warning(disable:6011)
-
+//#pragma warning(disable:6031)
+//#pragma warning(disable:6011)
 #include <stdio.h>
-
 #include <stdlib.h>
-
 #include <string.h>
-
 #include <malloc.h>
-
 #include <assert.h>
-
-
-
 #define STR_LEN 24
-
 #define CHILD_LEN 64
-
 #define BUFFER_SIZE 1024
 
-
-
+//构建成员信息结构体
 typedef struct _tMember {
-
 	char name[STR_LEN];
-
 	char wife[STR_LEN];
-
 }Member, * pMember;
-
-
-
+//构建家族层次结构体
 typedef struct _tTreeNode {
-
 	Member member;
-
 	struct _tTreeNode* parent;
-
 	struct _tTreeNode* children[CHILD_LEN];
-
 	int count;
-
 	int level;
-
-}TreeNode, * pTreeNode;
-
-
-
-pTreeNode createTreeNode(pTreeNode parent, pMember member) {
-
-	pTreeNode node = (pTreeNode)calloc(1, sizeof(TreeNode));
-
+}TreeNode, * PTreeNode;
+//创建家族树
+PTreeNode createTreeNode(PTreeNode parent, pMember member) {
+	PTreeNode node = (PTreeNode)calloc(1, sizeof(TreeNode));
 	if (node) {
-
 		node->member = *member;
-
 		if (parent) {
-
 			node->parent = parent;
-
 			node->level = parent->level + 1;
-
 			parent->children[parent->count++] = node;
-
 		}
-
 	}
-
 	return node;
-
 }
-
-
-
-void removeTreeNode(pTreeNode cursor) {
-
+//删除成员
+void removeTreeNode(PTreeNode cursor) {
 	if (cursor) {
-
 		if (cursor->parent) {
-
-			pTreeNode parent = cursor->parent;
-
+			PTreeNode parent = cursor->parent;
 			int position = -1;
-
 			for (int index = 0; index < parent->count; ++index) {
-
 				if (parent->children[index] == cursor) {
-
 					position = index;
-
 					break;
-
 				}
-
 			}
-
 			if (position != -1) {
-
 				for (int index = position + 1; index < parent->count; ++index) {
-
 					parent->children[index - 1] = parent->children[index];
-
 				}
-
 				--parent->count;
-
 			}
-
 		}
-
 	}
-
 }
-
-
-
-int countMemberLevel(const char content[]) {
+//获取家族世代数量
+int CountLevel(const char content[]) {
 
 	int level = 0;
 
@@ -133,169 +75,20 @@ int countMemberLevel(const char content[]) {
 	return level;
 
 }
-
-
-
-void inputSex(char sex[]) {
-
-	do {
-
-		int option;
-
-		printf("\n");
-
-		printf("----------\n");
-
-		printf(" 1 男\n");
-
-		printf(" 2 女\n");
-
-		printf("----------\n");
-
-		printf(" 请选择：");
-
-		scanf("%d", &option);
-
-		switch (option) {
-
-		case 1:
-
-			strcpy(sex, "男");
-
-			return;
-
-		case 2:
-
-			strcpy(sex, "女");
-
-			return;
-
-		}
-
-	} while (1);
-
-}
-
-
-
-int checkDate(const char date[]) {
-
-	int yyyy, mm, dd;
-
-	if (strlen(date) != 10) return 0;
-
-	if (sscanf(date, "%4d-%2d-%2d", &yyyy, &mm, &dd) != 3) return 0;
-
-	if (yyyy < 1999)return 0;
-
-	if (yyyy >= 3000) return 0;
-
-	if (mm < 1) return 0;
-
-	if (mm > 12) return 0;
-
-	if (dd < 1) return 0;
-
-	if (dd > 31) return 0;
-
-	return 1;
-
-}
-
-
-
-void inputDate(char date[]) {
-
-	do {
-
-		scanf("%s", date);
-
-		if (checkDate(date)) break;
-
-		printf("格式错误，请重新输入！（yyyy-mm-dd）\n");
-
-	} while (1);
-
-}
-void editFamilyMember1(pMember member) {
-
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 编辑家谱成员信息 *\n");
-
-	if (strlen(member->name)) {
-
-		printf(" 姓名：%s\n", member->name);
-
-	}
-
-	else {
-
-		printf(" 姓名：");
-
-		scanf("%s", member->name);
-
-	}
-
-	printf(" 妻子：");
+//添加成员的妻子
+void AddWife(pMember member) {
+	printf(" %s妻子：",member->name);
 
 	scanf("%s", member->wife);
 
-	printf("╚-----------------------------------------╝\n");
-
 }
-void editFamilyMember(pMember member) {
-
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 编辑家谱成员信息 *\n");
-
-	if (strlen(member->name)) {
-
-		printf(" 姓名：%s\n", member->name);
-
-	}
-
-	else {
-
-		printf(" 姓名：");
-
+//修改成员信息
+void EditMember(pMember member) {
+		printf("\n请输入新名字:\n");
 		scanf("%s", member->name);
-
-	}
-	printf(" 1修改男 0修改女：\n");
-	int k;
-	scanf("%d", &k);
-	if (k)
-	{
-		printf(" 丈夫：");
-		scanf("%s", member->name);
-	}
-	else
-	{
-		printf(" 妻子：");
-		scanf("%s", member->wife);
-	}
-
-	printf("╚-----------------------------------------╝\n");
-
 }
-
-
-
-void showFamilyMemberTitle() {
-
-	printf(" %-10s", "姓名");
-
-	printf(" %-10s", "妻子");
-
-	printf("\n");
-
-}
-
-
-
-void showFamilyMember(pMember member, int newline) {
+//陈列姓名
+void ShowMembers(pMember member, int newline) {
 
 	printf(" %-10s", member->name);
 
@@ -308,156 +101,84 @@ void showFamilyMember(pMember member, int newline) {
 	}
 
 }
-
-
-
-void recursiveFamilyTreeNodeShow(pTreeNode cursor, int brother_line[], int flag, int all) {
-
+//录入世代关系至文件
+void InputLeverFile(PTreeNode cursor, int brother_line[], int flag, int all) {
 	if (cursor) {
-
 		char generation[STR_LEN] = { 0 };
-
-		if (all) {
-
-			showFamilyMember(&cursor->member, 0);
-
-		}
-
-		sprintf(generation, "【%d世】", cursor->level + 1);
-
+		sprintf(generation, "【第%d代】", cursor->level + 1);
 		printf("%10s", generation);
-
 		if (cursor->level > 0) {
 
 			for (int index = 0; index < cursor->level - 1; ++index) {
 
 				if (brother_line[index]) {
-
-					printf(" │");
-
+					printf("    ");
+				}else {
+					printf("    ");
 				}
-
-				else {
-
-					printf(" ");
-
-				}
-
 			}
-
 			if (flag) {
-
-				printf(" ├─>");
-
+				printf("  >");
+			}else {
+				printf("  >");
 			}
-
-			else {
-
-				printf(" └─>");
-
-			}
-
 		}
-
 		printf(" %s %s\n", cursor->member.name, cursor->member.wife);
 
 		for (int index = 0; index < cursor->count; ++index) {
-
 			int flag = (index < cursor->count - 1);
-
 			if (flag) {
-
-				brother_line[cursor->level] = 1;
-
+				brother_line[cursor->level] = 1;//同辈
+			}else {
+				brother_line[cursor->level] = 0;//同辈
 			}
-
-			else {
-
-				brother_line[cursor->level] = 0;
-
-			}
-
-			pTreeNode child = cursor->children[index];
-
-			recursiveFamilyTreeNodeShow(child, brother_line, flag, all);
-
+			PTreeNode child = cursor->children[index];
+			InputLeverFile(child, brother_line, flag, all);
 		}
-
 		brother_line[cursor->level] = 0;
-
 	}
 
 }
-
-
-
-void recursiveFamilyTreeNodeSave(pTreeNode cursor, FILE* output) {
-
+//将键盘输入的合法成员录入文件
+void InputFile(PTreeNode cursor, FILE* output) {
 	if (cursor) {
-
 		if (cursor->level > 0) {
-
 			char format[STR_LEN] = { 0 };
-
-			sprintf(format, "%%%ds", cursor->level);
-
+			sprintf(format, "%%%ds", cursor->level);//在txt中%ns转义为n个空格
 			fprintf(output, format, " ");
-
 		}
-
 		fprintf(output, "%s ", cursor->member.name);
-
 		fprintf(output, "%s ", cursor->member.wife);
-
 		fprintf(output, "\n");
-
 		for (int index = 0; index < cursor->count; ++index) {
-
-			pTreeNode child = cursor->children[index];
-
-			recursiveFamilyTreeNodeSave(child, output);
-
+			PTreeNode child = cursor->children[index];
+			InputFile(child, output);
 		}
-
 	}
-
 }
-
-
-
-pTreeNode recursiveFamilyTreeNodeFind(pTreeNode cursor, const char name[]) {
-
+//文件中查找成员
+PTreeNode ResearchFromFile(PTreeNode cursor, const char name[]) {
 	if (cursor) {
 
 		if (strcmp(cursor->member.name, name) == 0 || strcmp(cursor->member.wife, name) == 0) {
-
 			return cursor;
-
 		}
-
 		for (int index = 0; index < cursor->count; ++index) {
 
-			pTreeNode child = cursor->children[index];
-
-			pTreeNode result = recursiveFamilyTreeNodeFind(child, name);
-
+			PTreeNode child = cursor->children[index];
+			PTreeNode result = ResearchFromFile(child, name);
 			if (result) {
-
 				return result;
-
 			}
-
 		}
 
 	}
 
-	return NULL;
+	return 0;
 
 }
-
-
-
-int recursiveFamilyTreeNodeCount(pTreeNode cursor) {
+//统计文件中成员数量
+int CountFromFile(PTreeNode cursor) {
 
 	int count = 0;
 
@@ -468,9 +189,9 @@ int recursiveFamilyTreeNodeCount(pTreeNode cursor) {
 		for (int index = 0; index < cursor->count; ++index) {
 
 
-			pTreeNode child = cursor->children[index];
+			PTreeNode child = cursor->children[index];
 
-			count += recursiveFamilyTreeNodeCount(child);
+			count += CountFromFile(child);
 
 		}
 
@@ -479,38 +200,24 @@ int recursiveFamilyTreeNodeCount(pTreeNode cursor) {
 	return count;
 
 }
-
-
-
-void recursiveFamilyTreeNodeClear(pTreeNode cursor) {
-
+//删除成员
+void DelMemberFromFile(PTreeNode cursor) {
 	if (cursor) {
-
 		for (int index = 0; index < cursor->count; ++index) {
-
-			pTreeNode child = cursor->children[index];
-
-			recursiveFamilyTreeNodeClear(child);
-
-		}
-
-		free(cursor);
-
+			PTreeNode child = cursor->children[index];
+			DelMemberFromFile(child);
+		}free(cursor);
 	}
 
 }
-
-
-
-pTreeNode loadFamilyTree() {
-
-	pTreeNode root = NULL;
-
+//统计家谱成员数量
+PTreeNode loadFamilyTree() {  
+	PTreeNode root = NULL;
 	FILE* input = fopen("familytree.txt", "r");
 
 	if (input) {
 
-		pTreeNode cursor = NULL;
+		PTreeNode cursor = NULL;
 
 		char buffer[BUFFER_SIZE] = { 0 };
 
@@ -520,14 +227,11 @@ pTreeNode loadFamilyTree() {
 
 			if (sscanf(buffer, "%s %s", member.name, member.wife) == 2) {
 
-				int level = countMemberLevel(buffer);
+				int level = CountLevel(buffer);
 
 				if (level == 0) {
-
 					assert(root == NULL);
-
 					root = createTreeNode(NULL, &member);
-
 					cursor = root;
 
 				}
@@ -567,166 +271,98 @@ pTreeNode loadFamilyTree() {
 	return root;
 
 }
-
-
-
-void saveFamilyTree(pTreeNode root) {
+//txt文件保存家族成员信息
+void saveFamilyTree(PTreeNode root) { //用txt文件保存家谱成员信息
 
 	FILE* output = fopen("familytree.txt", "w");
-
 	if (output) {
-
-		recursiveFamilyTreeNodeSave(root, output);
-
+		InputFile(root, output);
+		//结束访问文件
 		fclose(output);
 
 	}
 
 }
+//展示家族成员
+void showFamilyTree(PTreeNode root, int all) {
 
+	printf(" 【 显示家谱信息 】\n");
+	if (root == NULL) { printf(" [\t空\t] \n"); }
+	else {
+		int* brother_line = (int*)calloc(1024, sizeof(int));
 
+		InputLeverFile(root, brother_line, 0, all);
 
-void showFamilyTree(pTreeNode root, int all) {
-
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 显示家谱信息 *\n");
-
-	int* brother_line = (int*)calloc(1024, sizeof(int));
-
-	if (all) {
-
-		showFamilyMemberTitle();
-
+		free(brother_line);
 	}
-
-	recursiveFamilyTreeNodeShow(root, brother_line, 0, all);
-
-	free(brother_line);
-
-	printf("╚-----------------------------------------╝\n");
-
 }
-
-
-
-void addFamilyTree(pTreeNode* root) {
+//添加成员
+void AddMember(PTreeNode* root) {
 
 	char name[STR_LEN] = { 0 };
 
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 添加家谱成员 *\n");
+	printf(" 【 添加家谱成员 】\n");
 
 	printf(" 输入新成员姓名：");
 
 	scanf("%s", name);
-
+	//检查树是否为空
 	if (*root) {
-
-		if (!recursiveFamilyTreeNodeFind(*root, name)) {
-
-			pTreeNode target = NULL;
-
-			char parentname[STR_LEN] = { 0 };
-
-			printf(" 输入新成员的父亲或者母亲名字（指定关系）：");
-
-			scanf("%s", parentname);
-
-			target = recursiveFamilyTreeNodeFind(*root, parentname);
-
+		//非空则添加成员
+		if (!ResearchFromFile(*root, name)) {
+			PTreeNode target = NULL;
+			char MemberName[STR_LEN] = { 0 };
+			printf(" 请选择该成员要加入的族系（姓名）：");
+			scanf("%s", MemberName);
+			//查找父辈名字是否存在
+			target = ResearchFromFile(*root, MemberName);
 			if (target) {
-
 				Member member = { 0 };
-
 				strcpy(member.name, name);
-
-				editFamilyMember1(&member);
-
+				AddWife(&member);
 				createTreeNode(target, &member);
-
 				saveFamilyTree(*root);
-
-				showFamilyMemberTitle();
-
-				showFamilyMember(&member, 1);
-
 				printf("----------------\n");
-
-				printf("成功添加以上家谱成员！\n");
-
+				printf("添加成功！\n");
+			}else {
+				printf("添加失败，为找到该父辈名！\n");
 			}
-
-			else {
-
-				printf("添加失败，家谱中未找到该名字！\n");
-
-			}
-
+		}else {
+			printf("添加失败，该成员已存在！\n");
 		}
-
-		else {
-
-			printf("添加失败，该成员名称已经存在！\n");
-
-		}
-
 	}
-
+	//若树为空，则不进行选择上一代操作
 	else {
-
 		Member member = { 0 };
-
 		strcpy(member.name, name);
-
-		editFamilyMember(&member);
-
+		AddWife(&member);
 		*root = createTreeNode(NULL, &member);
-
 		saveFamilyTree(*root);
-
-		showFamilyMemberTitle();
-
-		showFamilyMember(&member, 1);
-
-		printf("----------------\n");
-
-		printf("成功添加以上家谱成员！\n");
-
+		printf("  添加成功！\n");
 	}
-
-	printf("╚-----------------------------------------╝\n");
-
 }
+//删除成员
+void DelMember(PTreeNode* root) {
 
-
-
-void removeFamilyTree(pTreeNode* root) {
-
-	pTreeNode target = NULL;
+	PTreeNode target = NULL;
 
 	char name[STR_LEN] = { 0 };
 
-	printf("╔-----------------------------------------╗\n");
-
-	printf("*  删除家谱成员 *\n");
+	printf("【  删除家谱成员 】\n");
 
 	printf(" 输入姓名：");
 
 	scanf("%s", name);
 
-	target = recursiveFamilyTreeNodeFind(*root, name);
+	target = ResearchFromFile(*root, name);
 
 	if (target) {
 
-		showFamilyMemberTitle();
-
-		showFamilyMember(&target->member, 1);
+		ShowMembers(&target->member, 1);
 
 		removeTreeNode(target);
 
-		recursiveFamilyTreeNodeClear(target);
+		DelMemberFromFile(target);
 
 		if (target == *root) {
 
@@ -738,37 +374,31 @@ void removeFamilyTree(pTreeNode* root) {
 
 		printf("----------------\n");
 
-		printf("成功删除以上家谱成员！\n");
+		printf("删除成功！\n");
 
 	}
 
 	else {
 
-		printf(" 没有找到相关信息！\n");
+		printf(" \n\t删除失败！家族中没有此人！ \n");
 
 	}
 
-	printf("╚-----------------------------------------╝\n");
-
 }
+//查询成员
+void FindMember(PTreeNode root) { 
 
-
-
-void findFamilyTree(pTreeNode root) {
-
-	pTreeNode target = NULL;
+	PTreeNode target = NULL;
 
 	char name[STR_LEN] = { 0 };
 
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 查找家谱成员 *\n");
+	printf(" 【 查找家谱成员 】\n");
 
 	printf(" 输入姓名：");
 
 	scanf("%s", name);
 
-	target = recursiveFamilyTreeNodeFind(root, name);
+	target = ResearchFromFile(root, name);
 
 	if (target) {
 
@@ -776,170 +406,105 @@ void findFamilyTree(pTreeNode root) {
 
 		printf("---------------\n");
 
-		showFamilyMemberTitle();
-
-		showFamilyMember(&target->member, 1);
-
-		printf("---------------\n");
-
 		printf("【所有孩子】\n");
 
-		recursiveFamilyTreeNodeShow(target, brother_line, 0, 0);
+		InputLeverFile(target, brother_line, 0, 0);
 
 		free(brother_line);
 
 		printf("【所有祖先】\n");
+		if (target->parent) {
+			while (target->parent) {
 
-		showFamilyMemberTitle();
+				target = target->parent;
 
-		while (target->parent) {
+				ShowMembers(&target->member, 1);
 
-			target = target->parent;
-
-			showFamilyMember(&target->member, 1);
-
+			}
 		}
-
+		else {
+			printf("[    空    ]\n");
+		}
 	}
 
 	else {
 
-		printf(" 没有找到相关信息！\n");
+		printf("\n\t查询失败！家族中不存在此人！\n\n");
 
 	}
 
-	printf("╚-----------------------------------------╝\n");
-
 }
-
-
-
-void modifyFamilyTree(pTreeNode root) {
-
-	pTreeNode target = NULL;
-
+//修改文件中成员姓名
+void EditFile(PTreeNode root) {
+	PTreeNode target = NULL;
 	char name[STR_LEN] = { 0 };
-
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 修改家谱成员 *\n");
-
-	printf(" 输入姓名：");
-
+	printf(" \n【 修改家谱成员 】\n");
+	printf(" 输入要修改的姓名：");
 	scanf("%s", name);
-
-	target = recursiveFamilyTreeNodeFind(root, name);
-
+	//检验人员是否存在
+	target = ResearchFromFile(root, name);
 	if (target) {
-
-		showFamilyMemberTitle();
-
-		showFamilyMember(&target->member, 1);
-
-		printf("----------------\n");
-
-		editFamilyMember(&target->member);
-
-		printf("----------------\n");
-
+		EditMember(&target->member);
 		saveFamilyTree(root);
-
-		printf("成功修改以上家谱成员！\n");
-
+		printf("   修改成功！\n");
+	}else {
+		printf(" 族谱中不存在此人！\n");
 	}
-
-	else {
-
-		printf(" 没有找到相关信息！\n");
-
-	}
-
-	printf("╚-----------------------------------------╝\n");
-
 }
+//统计家谱成员数量
+void CountMember(PTreeNode root) {
 
+	int count = CountFromFile(root);
 
-
-void statFamilyTree(pTreeNode root) {
-
-	int count = recursiveFamilyTreeNodeCount(root);
-
-	printf("╔-----------------------------------------╗\n");
-
-	printf(" * 统计家谱成员 *\n");
+	printf(" 【 统计家谱成员 】\n");
 
 	printf(" 成员数量：%d\n", count);
 
-	printf("╚-----------------------------------------╝\n");
-
 }
-
-
-
-void menuOptions(pTreeNode root) {
-
-	system("title 家族谱管理系统");
-int option = 1;
+//菜单
+void showMenu(PTreeNode root) {
+	int option = 1;
 	while (option) {
 		system("cls");
-		
-
-		printf("╔-----------------------------------------╗\n");
-
-		printf(" * 家族谱管理系统 *\n");
-
-		printf(" 1 . 显示家谱\n");
-
-		printf(" 2 . 添加家谱成员\n");
-
-		printf(" 3 . 删除家谱成员\n");
-
-		printf(" 4 . 查找家谱成员\n");
-
-		printf(" 5 . 修改家谱成员\n");
-
-		printf(" 6 . 统计家谱成员\n");
-
-		printf(" 0 . 退出\n");
-
-		printf("╚-----------------------------------------╝\n");
-
-		printf(" 请选择：");
+		printf(" 【 家族谱管理系统 】\n");
+		printf("------------------------\n");
+		printf(" [1]显示所有成员信息\n");
+		printf(" [2]添加成员\n");
+		printf(" [3]删除成员\n");
+		printf(" [4]查找成员信息\n");
+		printf(" [5]修改成员信息\n");
+		printf(" [6]统计成员数量\n");
+		printf(" [0]退出系统\n");
+		printf("----------------------\n");
+		printf(" 请选择序号：");
 
 		scanf("%d", &option);
-
-		
 		switch (option) {
 		case 0:
-			printf("\n\n\t再见~\n\n"); 
-				break;
-		case 1:
+			printf("\n\n\t再见~\n\n");
+			break;
+		case 1://展示
 			showFamilyTree(root, 1);
 			system("pause");
 			break;
-
-		case 2:
-			addFamilyTree(&root);
+		case 2://添加
+			AddMember(&root);
 			system("pause");
 			break;
-
-		case 3:
-			removeFamilyTree(&root);
+		case 3://删除
+			DelMember(&root);
 			system("pause");
 			break;
-
-		case 4:
-			findFamilyTree(root);
+		case 4://查找
+			FindMember(root);
 			system("pause");
 			break;
-
-		case 5:
-			modifyFamilyTree(root);
+		case 5://修改
+			EditFile(root);
 			system("pause");
 			break;
-
-		case 6:
-			statFamilyTree(root);
+		case 6://统计数量
+			CountMember(root);
 			system("pause");
 			break;
 		default:
@@ -947,20 +512,12 @@ int option = 1;
 			system("pause");
 			break;
 		}
-
 	}
-
 }
-
-
-
 int main() {
-
-	pTreeNode root = loadFamilyTree();
-	if (root) {
-		menuOptions(root);
-		recursiveFamilyTreeNodeClear(root);
-	}
+	PTreeNode root = loadFamilyTree();
+		showMenu(root);
+		//内存释放
+		DelMemberFromFile(root);
 	return 0;
-
 }
