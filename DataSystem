@@ -14,7 +14,6 @@ char name_[STR_LEN] = { 0 };
 typedef struct _tMember {
 	char name[STR_LEN];
 	char wife[STR_LEN];
-	double Birthday;
 }Member, * pMember;
 //构建家族层次结构体
 typedef struct _tTreeNode {
@@ -320,14 +319,8 @@ void AddMember(PTreeNode* root) {
 			//查找父辈名字是否存在
 			target = ResearchFromFile(*root, MemberName);
 			if (target) {
-				//请输入生日
-				printf("请输入生日：\n");
-				double Birthday;
-				scanf("%D", &Birthday);
 				Member member = { 0 };
-				Member birthday ={ 0 };
 				strcpy(member.name, name);
-				strcpy(birthday.Birthday, Birthday);
 				AddWife(&member);
 				createTreeNode(target, &member);
 				saveFamilyTree(*root);
